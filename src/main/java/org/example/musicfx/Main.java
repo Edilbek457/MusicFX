@@ -14,6 +14,7 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.sound.sampled.*;
@@ -54,6 +55,12 @@ public class Main extends Application {
         buttonRestart.setPrefWidth(70);
         buttonRestart.setPrefHeight(40);
 
+        Button buttonAutoRestart = new Button("OF\uD83D\uDD01");
+        buttonAutoRestart.setLayoutX(170);
+        buttonAutoRestart.setLayoutY(590);
+        buttonAutoRestart.setPrefWidth(70);
+        buttonAutoRestart.setPrefHeight(40);
+
         Button buttonSkip10sec = new Button(">");
         Button buttonBack10sec = new Button("<");
         Button buttonNext = new Button(">>");
@@ -85,7 +92,7 @@ public class Main extends Application {
         slider.setPrefWidth(300);
         slider.setMin(0);
         slider.setMax(100);
-        slider.setValue(30);
+        slider.setValue(20);
 
         String fileMSC = "music_list/";
         File file[] = new File[]{new File(fileMSC + "Svardstal_-_NIGHT_DRIVE_71484724 — копия.wav"),
@@ -135,14 +142,21 @@ public class Main extends Application {
         });
 
         buttonNext.setOnAction(e -> {
-            clip.get().setMicrosecondPosition(0);
-            clip.get().stop();
             try {
-                if ((i.get() + 1) != file.length) {
+                float SoundChange = ((FloatControl) clip.get().getControl(MASTER_GAIN)).getValue();
+
+                clip.get().stop();
+                clip.get().setMicrosecondPosition(0);
+
+                if ((i.get() + 1) < file.length) {
                     audioStream.set(AudioSystem.getAudioInputStream(file[i.get() + 1]));
                     i.set(i.get() + 1);
                     clip.set(AudioSystem.getClip());
                     clip.get().open(audioStream.get());
+
+                    FloatControl gainControl = (FloatControl) clip.get().getControl(MASTER_GAIN);
+                    gainControl.setValue(SoundChange);
+
                     clip.get().start();
                 } else {
                     clip.get().start();
@@ -152,15 +166,21 @@ public class Main extends Application {
             }
         });
 
+
         buttonPrevious.setOnAction(e -> {
-            clip.get().setMicrosecondPosition(0);
+            float SoundChange = ((FloatControl) clip.get().getControl(MASTER_GAIN)).getValue();
             clip.get().stop();
+            clip.get().setMicrosecondPosition(0);
             try {
-                if ((i.get() - 1) != file.length) {
+                if ((i.get() - 1) != -1) {
                     audioStream.set(AudioSystem.getAudioInputStream(file[i.get() - 1]));
-                    i.set(i.get() - 1);
+                    i.set(i.get() + 1);
                     clip.set(AudioSystem.getClip());
                     clip.get().open(audioStream.get());
+
+                    FloatControl gainControl = (FloatControl) clip.get().getControl(MASTER_GAIN);
+                    gainControl.setValue(SoundChange);
+
                     clip.get().start();
                 } else {
                     clip.get().start();
@@ -194,11 +214,13 @@ public class Main extends Application {
             clip.get().start();
         });
 
-
-        buttonRestart.setOnAction(e -> {
-            clip.get().stop();
-            clip.get().setMicrosecondPosition(0);
-            clip.get().start();
+        buttonAutoRestart.setOnAction(e -> {
+            String currentText = buttonRestart.getText();
+            if (currentText.equals("OF "+"\uD83D\uDD04")) {
+                buttonAutoRestart.setText("ON "+"\uD83D\uDD04");
+            } else if (currentText.equals("ON " +"\uD83D\uDD04") ){
+                buttonPlay.setText("OF "+ "\uD83D\uDD04");
+            }
         });
 
 
@@ -215,8 +237,10 @@ public class Main extends Application {
         pane.getChildren().add(buttonBack10sec);
         pane.getChildren().add(buttonNext);
         pane.getChildren().add(buttonPrevious);
+        pane.getChildren().add(buttonAutoRestart);
+
         Scene scene = new Scene(pane, 1072, 656);
-        String buttonHoverStyle = "-fx-background-color: #20f39d; -fx-text-fill: #050000;";
+        String buttonHoverStyle = "-fx-background-color: #20f39d; -fx-text-fill: #000000;";
         buttonPlay.setOnMouseEntered(e -> buttonPlay.setStyle(buttonHoverStyle));
         buttonPlay.setOnMouseExited(e -> buttonPlay.setStyle("-fx-background-color: #e5dbdb;"));
 
@@ -234,6 +258,11 @@ public class Main extends Application {
 
         buttonRestart.setOnMouseEntered(e -> buttonRestart.setStyle(buttonHoverStyle));
         buttonRestart.setOnMouseExited(e -> buttonRestart.setStyle("-fx-background-color: #e5dbdb;"));
+
+        buttonAutoRestart.setOnMouseEntered(e -> buttonAutoRestart.setStyle(buttonHoverStyle));
+        buttonAutoRestart.setOnMouseExited(e -> buttonAutoRestart.setStyle("-fx-background-color: #e5dbdb;"));
+
+        stage.setResizable(false);
         stage.setScene(scene);
 
         stage.show();
