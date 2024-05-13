@@ -25,6 +25,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException, UnsupportedAudioFileException, LineUnavailableException, InterruptedException {
         AtomicInteger i = new AtomicInteger();
+        AtomicBoolean AutoPlay = new AtomicBoolean(false);
         Pane pane = new Pane();
         Image image = new Image(getClass().getResource("/org/example/musicfx/Zamok — копия.jpeg").toExternalForm());
         ImageView imageView = new ImageView(image);
@@ -55,7 +56,7 @@ public class Main extends Application {
         buttonRestart.setPrefWidth(70);
         buttonRestart.setPrefHeight(40);
 
-        Button buttonAutoRestart = new Button("OF\uD83D\uDD01");
+        Button buttonAutoRestart = new Button("OF "+"AutoPlay");
         buttonAutoRestart.setLayoutX(170);
         buttonAutoRestart.setLayoutY(590);
         buttonAutoRestart.setPrefWidth(70);
@@ -99,7 +100,6 @@ public class Main extends Application {
                       new File(fileMSC + "LXST_CXNTURY_-_Andromeda_73377724 — копия.wav"),
                       new File(fileMSC + "ZXNTURY_JXXPSINNXR_FXLLEN_WXRRIOR_-_Farewell_74640904 — копия.wav")};
 
-
         AtomicReference<AudioInputStream> audioStream = new AtomicReference<>(AudioSystem.getAudioInputStream(file[i.get()]));
         AtomicReference<Clip> clip = new AtomicReference<>(AudioSystem.getClip());
         clip.get().open(audioStream.get());
@@ -120,15 +120,47 @@ public class Main extends Application {
         slider1.setValue(0);
 
         Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(1), event -> {
+                new KeyFrame(Duration.seconds(0.1), event -> {
                     long currentMicrosecondPosition = clip.get().getMicrosecondPosition();
                     slider1.setValue(currentMicrosecondPosition);
+                    if ((clip.get().getMicrosecondPosition() >= clip.get().getMicrosecondLength() - 50000) && (AutoPlay.get())) {
+                        try {
+                            float SoundChange = ((FloatControl) clip.get().getControl(MASTER_GAIN)).getValue();
+
+                            clip.get().stop();
+                            clip.get().setMicrosecondPosition(0);
+
+                            if ((i.get() + 1) < file.length - 1) {
+                                audioStream.set(AudioSystem.getAudioInputStream(file[i.get() + 1]));
+                                i.set(i.get() + 1);
+                                clip.set(AudioSystem.getClip());
+                                clip.get().open(audioStream.get());
+
+                                FloatControl gainControl = (FloatControl) clip.get().getControl(MASTER_GAIN);
+                                gainControl.setValue(SoundChange);
+
+                                clip.get().start();
+
+                            } else if (i.get() == file.length - 1) {
+                                i.set(0);
+                                audioStream.set(AudioSystem.getAudioInputStream(file[i.get()]));
+                                clip.set(AudioSystem.getClip());
+                                clip.get().open(audioStream.get());
+
+                                FloatControl gainControl = (FloatControl) clip.get().getControl(MASTER_GAIN);
+                                gainControl.setValue(SoundChange);
+                            } else {
+                                clip.get().start();
+                            }
+                        } catch (IOException | UnsupportedAudioFileException | LineUnavailableException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
                 })
         );
 
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
-
 
         buttonPlay.setOnAction(e -> {
             String currentText = buttonPlay.getText();
@@ -174,7 +206,7 @@ public class Main extends Application {
             try {
                 if ((i.get() - 1) != -1) {
                     audioStream.set(AudioSystem.getAudioInputStream(file[i.get() - 1]));
-                    i.set(i.get() + 1);
+                    i.set(i.get() - 1);
                     clip.set(AudioSystem.getClip());
                     clip.get().open(audioStream.get());
 
@@ -214,16 +246,22 @@ public class Main extends Application {
             clip.get().start();
         });
 
-        buttonAutoRestart.setOnAction(e -> {
-            String currentText = buttonRestart.getText();
-            if (currentText.equals("OF "+"\uD83D\uDD04")) {
-                buttonAutoRestart.setText("ON "+"\uD83D\uDD04");
-            } else if (currentText.equals("ON " +"\uD83D\uDD04") ){
-                buttonPlay.setText("OF "+ "\uD83D\uDD04");
-            }
+        buttonRestart.setOnAction(e -> {
+            clip.get().stop();
+            clip.get().setMicrosecondPosition(0);
+            clip.get().start();
         });
 
-
+        buttonAutoRestart.setOnAction(e -> {
+            String currentText = buttonAutoRestart.getText();
+            if (currentText.equals("OF "+"AutoPlay")) {
+                buttonAutoRestart.setText("ON "+"AutoPlay");
+                AutoPlay.set(true);
+            } else if (currentText.equals("ON "+"AutoPlay")) {
+                buttonAutoRestart.setText("OF "+"AutoPlay");
+                AutoPlay.set(false);
+            }
+        });
 
         pane.getChildren().add(slider);
         pane.getChildren().add(slider1);
