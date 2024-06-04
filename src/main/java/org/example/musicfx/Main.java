@@ -2,6 +2,7 @@ package org.example.musicfx;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -9,6 +10,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -93,22 +95,39 @@ public class Main extends Application {
         slider.setPrefWidth(300);
         slider.setMin(0);
         slider.setMax(100);
-        slider.setValue(20);
+        slider.setValue(40);
 
         String fileMSC = "music_list/";
-        File file[] = new File[]{new File(fileMSC + "Svardstal_-_NIGHT_DRIVE_71484724 — копия.wav"),
-                      new File(fileMSC + "LXST_CXNTURY_-_Andromeda_73377724 — копия.wav"),
-                      new File(fileMSC + "ZXNTURY_JXXPSINNXR_FXLLEN_WXRRIOR_-_Farewell_74640904 — копия.wav")};
+        File file[] = new File[]{new File(fileMSC + "Svardstal_-_NIGHT_DRIVE.wav"),
+                      new File(fileMSC + "LXST_CXNTURY_-_Andromeda.wav"),
+                      new File(fileMSC + "ZXNTURY_JXXPSINNXR_FXLLEN_WXRRIOR_-_Farewell.wav"),
+                      new File(fileMSC + "DVRST-Reason-to-Live-_slowed-_-reverb.wav"),
+                      new File(fileMSC + "Shadow-Onimxru-_-Smithmane-_slowed-reverb.wav"),
+                      new File(fileMSC + "smolov-SKY-rmx-Eternxlkz-SLAY-Slowed-Reverb.wav"),
+                      new File(fileMSC + "SXULTAPE-VISION-LOVE-_slowed-reverb.wav"),
+                      new File(fileMSC + "SXULTAPE-VISION-SUMMER-_Slowed-_-Reverb.wav"),
+                      new File(fileMSC + "TheGoldenYami-KUTE_-OBLXKQ-DREAMCORE-_slowed-reverb.wav"),
+                      new File(fileMSC + "yellow-pixie-night-finding-_slowed-reverb.wav"),
+                      new File(fileMSC + "PASTEL-GHOST-Silhouette.wav")};
 
         AtomicReference<AudioInputStream> audioStream = new AtomicReference<>(AudioSystem.getAudioInputStream(file[i.get()]));
         AtomicReference<Clip> clip = new AtomicReference<>(AudioSystem.getClip());
         clip.get().open(audioStream.get());
 
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            int volume = newValue.intValue();
-            float SoundChange = ((float) volume - 50.0f) / 3;
-            FloatControl gainControl = (FloatControl) clip.get().getControl(MASTER_GAIN);
-            gainControl.setValue(SoundChange);
+            if (slider.getValue() >= 30) {
+                float SoundChange = ((float) oldValue.intValue() - 60.0f) / 3;
+                FloatControl gainControl = (FloatControl) clip.get().getControl(MASTER_GAIN);
+                gainControl.setValue(SoundChange);
+            } else if (slider.getValue() == 0) {
+                float SoundChange = ((float) oldValue.intValue() - 80.0f);
+                FloatControl gainControl = (FloatControl) clip.get().getControl(MASTER_GAIN);
+                gainControl.setValue(SoundChange);
+            } else  {
+                float SoundChange = ((float) newValue.intValue() - 70.0f) / 3;
+                FloatControl gainControl = (FloatControl) clip.get().getControl(MASTER_GAIN);
+                gainControl.setValue(SoundChange);
+            }
         });
 
         Slider slider1 = new Slider();
@@ -116,17 +135,16 @@ public class Main extends Application {
         slider1.setLayoutY(510);
         slider1.setPrefWidth(900);
         slider1.setMin(0);
-        slider1.setMax(clip.get().getMicrosecondLength());
+        //slider1.setMax(clip.get().getMicrosecondLength());
         slider1.setValue(0);
 
         Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(0.1), event -> {
+                new KeyFrame(Duration.seconds(0.01), event -> {
                     long currentMicrosecondPosition = clip.get().getMicrosecondPosition();
                     slider1.setValue(currentMicrosecondPosition);
-                    if ((clip.get().getMicrosecondPosition() >= clip.get().getMicrosecondLength() - 50000) && (AutoPlay.get())) {
+                    if ((clip.get().getMicrosecondPosition() >= clip.get().getMicrosecondLength() - 70000) && (AutoPlay.get())) {
                         try {
-                            float SoundChange = ((FloatControl) clip.get().getControl(MASTER_GAIN)).getValue();
-
+                            float SoundChange = ((float) slider.getValue() - 60.0f) / 3;
                             clip.get().stop();
                             clip.get().setMicrosecondPosition(0);
 
@@ -142,6 +160,7 @@ public class Main extends Application {
                                 clip.get().start();
 
                             } else if (i.get() == file.length - 1) {
+                                clip.get().stop();
                                 i.set(0);
                                 audioStream.set(AudioSystem.getAudioInputStream(file[i.get()]));
                                 clip.set(AudioSystem.getClip());
@@ -149,6 +168,7 @@ public class Main extends Application {
 
                                 FloatControl gainControl = (FloatControl) clip.get().getControl(MASTER_GAIN);
                                 gainControl.setValue(SoundChange);
+                                clip.get().start();
                             } else {
                                 clip.get().start();
                             }
@@ -159,8 +179,21 @@ public class Main extends Application {
                 })
         );
 
+        Text text = new Text();
+        text.setText(String.valueOf(file[i.get()]));
+        text.setStyle("-fx-font-size: 25px;");
+
+        TranslateTransition translateTransition = new TranslateTransition(Duration.seconds(2), text);
+        text.setTranslateY(490);
+        text.setTranslateX(250);
+        translateTransition.setByX(50);
+        translateTransition.setCycleCount(Timeline.INDEFINITE);
+        translateTransition.setAutoReverse(true);
+        translateTransition.play();
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
+
+        pane.getChildren().add(text);
 
         buttonPlay.setOnAction(e -> {
             String currentText = buttonPlay.getText();
@@ -170,12 +203,12 @@ public class Main extends Application {
             } else if (currentText.equals("⏸") ){
                 clip.get().stop();
                 buttonPlay.setText("▶");
-            }
+            } slider1.setMax(clip.get().getMicrosecondLength());
         });
 
         buttonNext.setOnAction(e -> {
             try {
-                float SoundChange = ((FloatControl) clip.get().getControl(MASTER_GAIN)).getValue();
+                float SoundChange = ((float) slider.getValue() - 60.0f) / 3;
 
                 clip.get().stop();
                 clip.get().setMicrosecondPosition(0);
@@ -188,11 +221,12 @@ public class Main extends Application {
 
                     FloatControl gainControl = (FloatControl) clip.get().getControl(MASTER_GAIN);
                     gainControl.setValue(SoundChange);
-
                     clip.get().start();
+                    text.setText(String.valueOf(file[i.get()]));
                 } else {
                     clip.get().start();
-                }
+                    text.setText(String.valueOf(file[i.get()]));
+                } slider1.setMax(clip.get().getMicrosecondLength());
             } catch (IOException | UnsupportedAudioFileException | LineUnavailableException ex) {
                 ex.printStackTrace();
             }
@@ -200,7 +234,7 @@ public class Main extends Application {
 
 
         buttonPrevious.setOnAction(e -> {
-            float SoundChange = ((FloatControl) clip.get().getControl(MASTER_GAIN)).getValue();
+            float SoundChange = ((float) slider.getValue() - 60.0f) / 3;
             clip.get().stop();
             clip.get().setMicrosecondPosition(0);
             try {
@@ -212,11 +246,14 @@ public class Main extends Application {
 
                     FloatControl gainControl = (FloatControl) clip.get().getControl(MASTER_GAIN);
                     gainControl.setValue(SoundChange);
-
+                    text.setText(String.valueOf(file[i.get()]));
                     clip.get().start();
                 } else {
+                    text.setText(String.valueOf(file[i.get()]));
                     clip.get().start();
+
                 }
+                slider1.setMax(clip.get().getMicrosecondLength());
             } catch (IOException | UnsupportedAudioFileException | LineUnavailableException ex) {
                 ex.printStackTrace();
             }
@@ -227,10 +264,13 @@ public class Main extends Application {
             long currentPosition = clip.get().getMicrosecondPosition();
             if ((clip.get().getMicrosecondPosition() + 10000000) >= clip.get().getMicrosecondLength()) {
                 clip.get().setMicrosecondPosition(0);
+                slider1.setMax(clip.get().getMicrosecondLength());
             } else {
                 long newPosition = currentPosition + 10000000;
                 clip.get().setMicrosecondPosition(newPosition);
+                slider1.setMax(clip.get().getMicrosecondLength());
             }
+            text.setText(String.valueOf(file[i.get()]));
             clip.get().start();
         });
 
@@ -243,6 +283,8 @@ public class Main extends Application {
                 long newPosition = currentPosition - 10000000;
                 clip.get().setMicrosecondPosition(newPosition);
             }
+            slider1.setMax(clip.get().getMicrosecondLength());
+            text.setText(String.valueOf(file[i.get()]));
             clip.get().start();
         });
 
@@ -250,6 +292,7 @@ public class Main extends Application {
             clip.get().stop();
             clip.get().setMicrosecondPosition(0);
             clip.get().start();
+            slider1.setMax(clip.get().getMicrosecondLength());
         });
 
         buttonAutoRestart.setOnAction(e -> {
@@ -261,6 +304,7 @@ public class Main extends Application {
                 buttonAutoRestart.setText("OF "+"AutoPlay");
                 AutoPlay.set(false);
             }
+            slider1.setMax(clip.get().getMicrosecondLength());
         });
 
         pane.getChildren().add(slider);
