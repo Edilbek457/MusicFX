@@ -17,5 +17,7 @@ public class MusicList {
             new File(fileMSC + "SXULTAPE-VISION-SUMMER-_Slowed-_-Reverb.wav"),
             new File(fileMSC + "TheGoldenYami-KUTE_-OBLXKQ-DREAMCORE-_slowed-reverb.wav"),
             new File(fileMSC + "yellow-pixie-night-finding-_slowed-reverb.wav"),
+            new File(fileMSC + "DRKHVN-SWERVE-slowed-reverb.wav"),
+            new File(fileMSC + "ENXK-EUPHORIA-_slowed-reverb.wav"),
             new File(fileMSC + "PASTEL-GHOST-Silhouette.wav")};
 }
