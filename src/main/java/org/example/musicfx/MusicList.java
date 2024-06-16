@@ -19,5 +19,7 @@ public class MusicList {
             new File(fileMSC + "yellow-pixie-night-finding-_slowed-reverb.wav"),
             new File(fileMSC + "DRKHVN-SWERVE-slowed-reverb.wav"),
             new File(fileMSC + "ENXK-EUPHORIA-_slowed-reverb.wav"),
+            new File(fileMSC + "LXRY-PXNK-DESOLATE-_slowed-reverb_.mp4_1.wav"),
+            new File(fileMSC + " XXDED-i-like-the-way-you-kiss-me-_slowed-reverb_.wav"),
             new File(fileMSC + "PASTEL-GHOST-Silhouette.wav")};
 }
