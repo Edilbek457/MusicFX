@@ -11,7 +11,9 @@ public class ButtonsAndSliders {
     static Button buttonBack10sec = new Button("<");
     static Button buttonNext = new Button(">>");
     static Button buttonPrevious = new Button("<<");
-    static Button buttonsound = new Button("\uD83D\uDD0A");
+    static Button buttonSound = new Button("\uD83D\uDD0A");
+    static Button addMusicButton = new Button("add music file .wav");
+    static Button clearMusicListButton = new Button("Clear music list");
     static Slider slider = new Slider();
     static Slider slider1 = new Slider();
 }
