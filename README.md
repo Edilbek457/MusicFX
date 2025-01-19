@@ -36,15 +36,19 @@ Before installation, make sure you have the following:
 ## 🚀 Installation
 
 1. **Clone the repository**
+
     git clone https://github.com/Edilbek457/MusicFX.git
+
     cd MusicFX
 
 2. **Build the project**
+
     Use Maven to download dependencies and compile the project:
     
     mvn clean install
 
 3. **Verify dependencies**
+
     Ensure all dependencies are properly resolved:
     
     mvn dependency:resolve
