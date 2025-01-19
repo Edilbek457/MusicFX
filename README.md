@@ -75,5 +75,5 @@ Before installation, make sure you have the following:
         Observe the track duration and current position through the blue slider.
 10. AutoPlay Modes
         OFF AutoPlay: Disable autoplay.
-        ON(1) AutoPlay: Enable autoplay for the current track.
-        ON(2) AutoPlay: Enable autoplay to play all tracks sequentially.
+        ON(1) AutoPlay: Enable autoplay to play all tracks sequentially.
+        ON(2) AutoPlay: Enable autoplay for the current track.
