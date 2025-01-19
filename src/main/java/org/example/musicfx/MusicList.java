@@ -1,26 +1,34 @@
 package org.example.musicfx;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.example.musicfx.ButtonsAndSliders.addMusicButton;
 
 public class MusicList {
     static String fileMSC = "music_list/";
-    static File[] file = new File[]{
-            new File(fileMSC + "DRKHVN-SWERVE-slowed-reverb.wav"),
-            new File(fileMSC + "DVRST-Reason-to-Live-_slowed-_-reverb.wav"),
-            new File(fileMSC + "ENXK-EUPHORIA-_slowed-reverb.wav"),
-            new File(fileMSC + "LXRY-PXNK-DESOLATE-_slowed-reverb_.mp4_1.wav"),
-            new File(fileMSC + "LXST_CXNTURY_-_Andromeda.wav"),
-            new File(fileMSC + "MONTAGEM-DO-COSMOS-_slowed-reverb.wav"),
-            new File(fileMSC + "PASTEL-GHOST-Silhouette.wav"),
-            new File(fileMSC + "Shadow-Onimxru-_-Smithmane-_slowed-reverb.wav"),
-            new File(fileMSC + "smolov-SKY-rmx-Eternxlkz-SLAY-Slowed-Reverb.wav"),
-            new File(fileMSC + "Svardstal_-_NIGHT_DRIVE.wav"),
-            new File(fileMSC + "SXULTAPE-VISION-LOVE-_slowed-reverb.wav"),
-            new File(fileMSC + "SXULTAPE-VISION-SUMMER-_Slowed-_-Reverb.wav"),
-            new File(fileMSC + "TheGoldenYami-KUTE_-OBLXKQ-DREAMCORE-_slowed-reverb.wav"),
-            new File(fileMSC + "WAVEMANE - MIDNIGHT (slowed + reverb).wav"),
-            new File(fileMSC + "XXDED-i-like-the-way-you-kiss-me-_slowed-reverb_.wav"),
-            new File(fileMSC + "yellow-pixie-night-finding-_slowed-reverb.wav"),
-            new File(fileMSC + "ZXNTURY_JXXPSINNXR_FXLLEN_WXRRIOR_-_Farewell.wav")};
+    static List<File> file = new ArrayList<>(Arrays.asList(
+            new File(fileMSC + "Ether – Silent Partner (No Copyright Music).wav")
+    ));
+
+    public static void addMusicWav(File newFile) {
+        if (newFile != null && newFile.getName().endsWith(".wav")) {
+            file.add(newFile);
+            addMusicButton.setStyle("-fx-background-color:rgb(29, 247, 9);");
+            addMusicButton.setText("Added!");
+        } else {
+            addMusicButton.setStyle("-fx-background-color:rgb(253, 9, 9);");
+            addMusicButton.setText("Selected file not .wav");
+        }
+    }
+    
+    
+    public static void  clearMusicList (AtomicInteger atomicInteger) {
+        File lastFile = new File(file.get(atomicInteger.get()).getPath());
+        file.clear();
+        file.add(lastFile);
+    }
 }
