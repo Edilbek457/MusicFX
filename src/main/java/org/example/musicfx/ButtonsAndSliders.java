@@ -6,7 +6,7 @@ import javafx.scene.control.Slider;
 public class ButtonsAndSliders {
     static Button buttonPlay = new Button("▶");
     static Button buttonRestart = new Button("\uD83D\uDD04");
-    static Button buttonAutoRestart = new Button("OFF "+"AutoPlay");
+    static Button buttonAutoRestart = new Button("OFF "+ "AutoPlay");
     static Button buttonSkip10sec = new Button(">");
     static Button buttonBack10sec = new Button("<");
     static Button buttonNext = new Button(">>");
